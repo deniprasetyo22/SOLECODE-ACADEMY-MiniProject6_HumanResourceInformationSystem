@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MiniProject6.Persistence.Migrations
 {
     [DbContext(typeof(HrisContext))]
-    [Migration("20240829103931_AddIdentity")]
-    partial class AddIdentity
+    [Migration("20241127085503_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -327,11 +327,19 @@ namespace MiniProject6.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("supervisorid");
 
+                    b.Property<string>("userId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("userId");
+
                     b.HasKey("Empid");
 
                     b.HasIndex("Deptid");
 
                     b.HasIndex("SupervisorId");
+
+                    b.HasIndex("userId")
+                        .IsUnique();
 
                     b.HasIndex(new[] { "Ssn" }, "employee_ssn_key")
                         .IsUnique();
@@ -409,9 +417,17 @@ namespace MiniProject6.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("hoursworked");
 
+                    b.Property<string>("Userid")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("userid");
+
                     b.HasKey("Empid", "Projid");
 
                     b.HasIndex("Projid");
+
+                    b.HasIndex("Userid")
+                        .IsUnique();
 
                     b.ToTable("workson");
                 });
@@ -565,6 +581,13 @@ namespace MiniProject6.Persistence.Migrations
                         .WithMany("Subordinates")
                         .HasForeignKey("SupervisorId");
 
+                    b.HasOne("MiniProject6.Domain.Models.AppUser", "AppUser")
+                        .WithOne("Employee")
+                        .HasForeignKey("MiniProject5.Persistence.Models.Employee", "userId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("AppUser");
+
                     b.Navigation("Dept");
 
                     b.Navigation("Supervisor");
@@ -604,6 +627,12 @@ namespace MiniProject6.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MiniProject6.Domain.Models.AppUser", "AppUser")
+                        .WithOne("Worksons")
+                        .HasForeignKey("MiniProject5.Persistence.Models.Workson", "Userid");
+
+                    b.Navigation("AppUser");
+
                     b.Navigation("Emp");
 
                     b.Navigation("Proj");
@@ -631,6 +660,13 @@ namespace MiniProject6.Persistence.Migrations
 
             modelBuilder.Entity("MiniProject5.Persistence.Models.Project", b =>
                 {
+                    b.Navigation("Worksons");
+                });
+
+            modelBuilder.Entity("MiniProject6.Domain.Models.AppUser", b =>
+                {
+                    b.Navigation("Employee");
+
                     b.Navigation("Worksons");
                 });
 #pragma warning restore 612, 618

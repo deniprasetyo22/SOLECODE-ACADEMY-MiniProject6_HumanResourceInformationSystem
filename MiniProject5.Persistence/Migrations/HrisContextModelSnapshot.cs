@@ -414,9 +414,17 @@ namespace MiniProject6.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("hoursworked");
 
+                    b.Property<string>("Userid")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("userid");
+
                     b.HasKey("Empid", "Projid");
 
                     b.HasIndex("Projid");
+
+                    b.HasIndex("Userid")
+                        .IsUnique();
 
                     b.ToTable("workson");
                 });
@@ -616,6 +624,12 @@ namespace MiniProject6.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MiniProject6.Domain.Models.AppUser", "AppUser")
+                        .WithOne("Worksons")
+                        .HasForeignKey("MiniProject5.Persistence.Models.Workson", "Userid");
+
+                    b.Navigation("AppUser");
+
                     b.Navigation("Emp");
 
                     b.Navigation("Proj");
@@ -649,6 +663,8 @@ namespace MiniProject6.Persistence.Migrations
             modelBuilder.Entity("MiniProject6.Domain.Models.AppUser", b =>
                 {
                     b.Navigation("Employee");
+
+                    b.Navigation("Worksons");
                 });
 #pragma warning restore 612, 618
         }
